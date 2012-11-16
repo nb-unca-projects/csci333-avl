@@ -24,19 +24,23 @@ bool BST<T>::find(T v) {
 
 template <typename T>
 void BST<T>::rotate(int direction, Node<T>** cn) {
+  if(cn == 0)
+    cn = &root;
   if (direction == -1) {
     //rotate left
-    Node<T>** temp = cn;
-    cn = &((*temp)->getRightChild());
-    (*temp)->setRightChild(*(*temp)->getLeftChild());
-    (*cn)->setLeftChild(**temp);
+    Node<T>* temp = *cn;
+    Node<T>* child = ((*cn)->getRightChild())->getLeftChild();
+    *cn = temp->getRightChild();
+    (*cn)->setLeftChild(*temp);
+    temp->setRightChild(*child); 
   }
   else {
     //rotate right
-    Node<T>** temp = cn;
-    cn = &((*temp)->getLeftChild());
-    (*temp)->setLeftChild(*(*temp)->getRightChild());
-    (*cn)->setRightChild(**temp);    
+    Node<T>* temp = *cn;
+    Node<T>* child = ((*cn)->getLeftChild())->getRightChild();
+    *cn = temp->getLeftChild();
+    (*cn)->setRightChild(*temp);
+    temp->setLeftChild(*child);
   }
 }
 
@@ -61,20 +65,20 @@ void BST<T>::insert(T v) {
   if (*P != 0)
     return;
   *P = newNode;
-  Node<T>** R = 0;
+  Node<T>* R = 0;
   Node<T>** C = 0;
   Node<T>** B = 0;
   int d1;
   int d2;
   int d3;
   if (!CritNodeFound)
-    R = &root;
+    R = root;
   else {
       if (v == (*A)->getValue()){
         C = A;
         d1 = 0;
       } else if (v < (*A)->getValue()) {
-        C = &((*P)->getLeftChild());
+        C = &((*A)->getLeftChild());
         d1 = -1;
       } else {
         C = &((*A)->getRightChild());
@@ -82,7 +86,7 @@ void BST<T>::insert(T v) {
       }
     if ((*A)->getBalance() != d1) {
       (*A)->setBalance(0);
-      R = C;
+      R = *C;
     }
     else {
   	if (v == (*C)->getValue()){
@@ -97,19 +101,19 @@ void BST<T>::insert(T v) {
   	}
       if (d2 == d1) {
         (*A)->setBalance(0);
-        R = B;
+        R = *B;
 	rotate(-d1, A);
       }
       else {
-        d3 = getDir(R, v, B);
+       
   	if (v == (*B)->getValue()){
-          R = B;
+          R = *B;
     	  d3 = 0;
   	} else if (v < (*B)->getValue()) {
-   	  R = &((*B)->getLeftChild());
+   	  R = ((*B)->getLeftChild());
   	  d3 = -1;
  	} else {
-   	  R = &((*B)->getRightChild());
+   	  R = ((*B)->getRightChild());
     	  d3 = 1;
   	}
 	if (d3 == d2) {
@@ -125,14 +129,14 @@ void BST<T>::insert(T v) {
       }
     }
   }
-  while ((*R)->getValue() != v) {
-    if (v < (*R)->getValue()) {
-      (*R)->setBalance(-1);
-      R = &((*R)->getLeftChild());
+  while (R->getValue() != v) {
+    if (v < R->getValue()) {
+      R->setBalance(-1);
+      R = R->getLeftChild();
     }
     else {
-      (*R)->setBalance(1);
-      R = &((*R)->getRightChild());
+      R->setBalance(1);
+      R = R->getRightChild();
     }
   }
 }
@@ -176,13 +180,7 @@ void BST<T>::remove(T v) {
 
 template <typename T>
 void BST<T>::print() {
-  std::list<string>* printQ = createPrintQueue();
-  int size = (int)printQ->size();
-  std::cout << size << " " << getDepth(root, 0) << std::endl;
-  for (int i=0; i<size; ++i) {
-    std::cout << printQ->front() << std::endl;
-    printQ->pop_front();
-  }
+  traversalPrint(root);
 }
 
 template <typename T>
@@ -242,6 +240,7 @@ void BST<T>::traversalPrint(Node<T>* root) {
     traversalPrint(root->getLeftChild());
     std::cout << root->getValue() << std::endl;
     traversalPrint(root->getRightChild());
+    //std::cout << root->getValue() << std::endl;
   }
 }
 
