@@ -41,20 +41,6 @@ void BST<T>::rotate(int direction, Node<T>** cn) {
 }
 
 template <typename T>
-int BST<T>::getDir(Node<T>** Q, T K, Node<T>** P){
-  if (K == (*P)->getValue()){
-    Q = P;
-    return 0;
-  } else if (K < (*P)->getValue()) {
-    Q = &((*P)->getLeftChild());
-    return -1;
-  } else {
-    Q = &((*P)->getRightChild());
-    return 1;
-  }
-}
-
-template <typename T>
 void BST<T>::insert(T v) {
     Node<T>* newNode = new Node<T>(v);
   Node<T>** P = &root;
@@ -84,13 +70,31 @@ void BST<T>::insert(T v) {
   if (!CritNodeFound)
     R = &root;
   else {
-    d1 = getDir(C, v, A);
+      if (v == (*A)->getValue()){
+        C = A;
+        d1 = 0;
+      } else if (v < (*A)->getValue()) {
+        C = &((*P)->getLeftChild());
+        d1 = -1;
+      } else {
+        C = &((*A)->getRightChild());
+        d1 = 1;
+      }
     if ((*A)->getBalance() != d1) {
       (*A)->setBalance(0);
       R = C;
     }
     else {
-      d2 = getDir(B, v, C);
+  	if (v == (*C)->getValue()){
+    	  B = C;
+    	  d2 = 0;
+  	} else if (v < (*C)->getValue()) {
+    	  B = &((*C)->getLeftChild());
+    	  d2 = -1;
+  	} else {
+    	  B = &((*C)->getRightChild());
+    	  d2 = 1;
+  	}
       if (d2 == d1) {
         (*A)->setBalance(0);
         R = B;
@@ -98,6 +102,16 @@ void BST<T>::insert(T v) {
       }
       else {
         d3 = getDir(R, v, B);
+  	if (v == (*B)->getValue()){
+          R = B;
+    	  d3 = 0;
+  	} else if (v < (*B)->getValue()) {
+   	  R = &((*B)->getLeftChild());
+  	  d3 = -1;
+ 	} else {
+   	  R = &((*B)->getRightChild());
+    	  d3 = 1;
+  	}
 	if (d3 == d2) {
 	  (*A)->setBalance(0);
 	  (*C)->setBalance(d1);
