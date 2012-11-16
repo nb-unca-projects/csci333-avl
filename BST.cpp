@@ -33,22 +33,50 @@ void BST<T>::rotate(int direction, Node<T>** cn) {
   }
   else {
     //rotate right
-    
+    Node<T>** temp = cn;
+    cn = &((*temp)->getLeftChild());
+    (*temp)->setLeftChild(*(*temp)->getRightChild());
+    (*cn)->setRightChild(**temp);    
   }
 }
+
+template <typename T>
+int BST<T>::getDir(Node<T>** Q, T K, Node<T>** P){
+  if (K == (*P)->getValue()){
+    Q = P;
+    return 0;
+  } else if (K < (*P)->getValue()) {
+    Q = &((*P)->getLeftChild());
+    return -1;
+  } else {
+    Q = &((*P)->getRightChild());
+    return 1;
+  }
+}
+
 template <typename T>
 void BST<T>::insert(T v) {
-  Node<T>* temp = new Node<T>(v);
-  Node<T>** curr = &root;
-
-  while (*curr != 0) {
-    if (v < (*curr)->getValue()) {
-      curr = &((*curr)->getLeftChild());
-    } else if (v > (*curr)->getValue()) {
-      curr = &((*curr)->getRightChild());
+  Node<T>* newNode = new Node<T>(v);
+  Node<T>** P = &root;
+  Node<T>** A;
+  bool CritNodeFound = false;
+  
+  while (*P != 0 && (*P)->getValue() != v) {
+    if ((*P)->getBalance() != 0) {
+      A = P;
+      CritNodeFound = true;
+    }
+    if ((*P)->getValue() > v) {
+      P = &((*P)->getLeftChild());
+    } else {
+      P = &((*P)->getRightChild());
     }
   }
-  *curr = temp;
+  //Node with value v already exists
+  if (*P != 0)
+    return;
+  *P = newNode;
+  
 }
 
 template <typename T>
