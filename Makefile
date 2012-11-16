@@ -1,9 +1,9 @@
 CPP = g++
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -ggdb
 
 
 ttest: tree_test.cpp BST.o Node.o
-	$(CPP) $(CFLAGS) -o ttest $^
+	$(CPP) $(CFLAGS) -o ttest $^ 
 
 BST.o: BST.h BST.cpp
 	$(CPP) $(CFLAGS) -c BST.cpp
