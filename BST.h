@@ -14,6 +14,7 @@ class BST {
   int getDepth(Node<T>* root, int depth);
   std::string toString(T v);
   void rotate(int direction, Node<T>** cn);
+  int updateBalance(Node<T>* n);
 
  public:
   BST<T>();

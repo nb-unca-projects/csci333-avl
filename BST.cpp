@@ -144,7 +144,12 @@ void BST<T>::insert(T v) {
 template <typename T>
 void BST<T>::remove(T v) {
   Node<T>** curr = &root;
+  Node<T>** parent;
+  std::list< Node<T>** >* path = new std::list< Node<T>** >();
+
   while (*curr != 0 && (*curr)->getValue() != v) {
+    parent = curr;
+    path->push_back(parent);
     if ((*curr)->getValue() > v)
       curr = &((*curr)->getLeftChild());
     else if ((*curr)->getValue() < v)
@@ -168,14 +173,58 @@ void BST<T>::remove(T v) {
   }else {
     //find inorder successor (ios)
     Node<T>* ios = (*curr)->getRightChild();
-    while (ios->getLeftChild() != 0) {
-      ios = ios->getLeftChild();
+    Node<T>* iosParent;
+    if (ios->getLeftChild() == 0){
+      iosParent = *curr;
+    }
+    else {
+      while (ios->getLeftChild() != 0) {
+        iosParent = ios;
+        ios = ios->getLeftChild();
+      }
     }
     ios->setLeftChild(*((*curr)->getLeftChild()));
     *curr = ios;
+    //manually update ios and iosParent balances
+    ios->setBalance(updateBalance(ios));
+    iosParent->setBalance(updateBalance(iosParent));
     delete temp;
   }
+  //update balances along path
+  while (!path->empty()) {
+    parent = path->back();
+    path->pop_back();
+    if ((*parent)->getBalance() == 0) {
+      (*parent)->setBalance(updateBalance(*parent));
+      break;
+    }
+    (*parent)->setBalance(updateBalance(*parent));
+    if ((*parent)->getBalance() == 2) {
+      if (((*parent)->getRightChild())->getBalance() == -1) {
+        rotate(1, &(*parent)->getRightChild());
+        rotate(-1, parent);
+      }
+      else
+        rotate(-1, parent);
+    }
+    if ((*parent)->getBalance() == -2) {
+      if (((*parent)->getLeftChild())->getBalance() == 1) {
+        rotate(1, &(*parent)->getLeftChild());
+	rotate(-1, parent);
+      }
+      else
+	rotate(-1, parent);
+    }
+    (*parent)->setBalance(updateBalance(*parent));
+  }
  }
+}
+
+template <typename T>
+int BST<T>::updateBalance(Node<T>* n) {
+  int leftHeight = getDepth(n->getLeftChild(), 0);
+  int rightHeight = getDepth(n->getRightChild(), 0);
+  return rightHeight - leftHeight;
 }
 
 template <typename T>
